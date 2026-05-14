@@ -1,6 +1,9 @@
 "use client";
 
-import { Bell, Search } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Search } from "lucide-react";
+import { supabase } from "@/lib/supabase/client";
+import { toast } from "sonner";
 
 interface HeaderProps {
   title: string;
@@ -8,24 +11,34 @@ interface HeaderProps {
 }
 
 export function DashboardHeader({ title, description }: HeaderProps) {
+  const [initials, setInitials] = useState("U");
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      const name = user.user_metadata?.full_name || user.email || "";
+      const parts = name.split(/[\s@]/);
+      setInitials(parts.filter(Boolean).map((p: string) => p[0]).join("").toUpperCase().slice(0, 2) || "U");
+    });
+  }, []);
+
   return (
-    <div className="flex items-center justify-between mb-8">
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "2rem" }}>
       <div>
-        <h1 className="text-2xl font-bold text-slate-100">{title}</h1>
-        {description && (
-          <p className="text-sm text-slate-500 mt-0.5">{description}</p>
-        )}
+        <h1 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#f1f5f9" }}>{title}</h1>
+        {description && <p style={{ fontSize: "0.875rem", color: "#475569", marginTop: "0.125rem" }}>{description}</p>}
       </div>
-      <div className="flex items-center gap-3">
-        <button className="w-9 h-9 rounded-lg glass flex items-center justify-center text-slate-500 hover:text-slate-200 transition-colors hover:bg-white/6 border border-white/5">
-          <Search className="w-4 h-4" />
+      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+        <button
+          onClick={() => toast.info("Search coming soon!")}
+          style={{ width: "2.25rem", height: "2.25rem", borderRadius: "0.5rem", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569", cursor: "pointer", transition: "all 0.15s" }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "#e2e8f0"; e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "#475569"; e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}
+        >
+          <Search style={{ width: "1rem", height: "1rem" }} />
         </button>
-        <button className="w-9 h-9 rounded-lg glass flex items-center justify-center text-slate-500 hover:text-slate-200 transition-colors hover:bg-white/6 border border-white/5 relative">
-          <Bell className="w-4 h-4" />
-          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-purple-500" />
-        </button>
-        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center text-white text-xs font-bold cursor-pointer shadow-[0_0_10px_rgba(139,92,246,0.3)]">
-          U
+        <div style={{ width: "2.25rem", height: "2.25rem", borderRadius: "0.5rem", background: "linear-gradient(135deg,#8b5cf6,#06b6d4)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "0.75rem", fontWeight: 700, cursor: "default", boxShadow: "0 0 10px rgba(139,92,246,0.3)" }}>
+          {initials}
         </div>
       </div>
     </div>
