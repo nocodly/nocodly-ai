@@ -5,9 +5,9 @@ import { useState, useEffect } from "react";
 import { Sparkles, Menu, X } from "lucide-react";
 
 const NAV_LINKS = [
-  { label: "Features", href: "#features" },
+  { label: "Features", href: "/#features" },
   { label: "Pricing", href: "/pricing" },
-  { label: "Docs", href: "#" },
+  { label: "Docs", href: "/docs" },
 ];
 
 export function Navbar() {

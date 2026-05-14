@@ -1,83 +1,135 @@
 import Link from "next/link";
 import { Sparkles, ExternalLink, AtSign } from "lucide-react";
 
+const PRODUCT_LINKS = [
+  { label: "Features", href: "/#features" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Changelog", href: "/changelog" },
+  { label: "Roadmap", href: "/roadmap" },
+];
+
+const COMPANY_LINKS = [
+  { label: "About", href: "/about" },
+  { label: "Blog", href: "/blog" },
+  { label: "Careers", href: "/about" },
+  { label: "Contact", href: "/contact" },
+];
+
+const LEGAL_LINKS = [
+  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms" },
+  { label: "Security", href: "/security" },
+  { label: "Cookies", href: "/cookies" },
+];
+
+function FooterLinkList({ title, links }: { title: string; links: { label: string; href: string }[] }) {
+  return (
+    <div>
+      <h4 style={{
+        fontSize: "0.6875rem", fontWeight: 600, color: "#cbd5e1",
+        textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.75rem",
+      }}>
+        {title}
+      </h4>
+      <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+        {links.map((link) => (
+          <li key={link.label}>
+            <Link
+              href={link.href}
+              style={{ fontSize: "0.875rem", color: "#475569", textDecoration: "none", transition: "color 0.2s" }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = "#cbd5e1"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = "#475569"; }}
+            >
+              {link.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export function Footer() {
   return (
-    <footer className="border-t border-white/5 py-12 mt-20">
-      <div className="section-container">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
-          {/* Brand */}
-          <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
-                <Sparkles className="w-3.5 h-3.5 text-white" />
+    <footer style={{
+      borderTop: "1px solid rgba(255,255,255,0.05)",
+      paddingTop: "3rem",
+      paddingBottom: "3rem",
+      marginTop: "5rem",
+    }}>
+      <div style={{ maxWidth: "80rem", margin: "0 auto", padding: "0 1.5rem" }}>
+
+        {/* Top grid */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+          gap: "2rem",
+          marginBottom: "2.5rem",
+        }}>
+          {/* Brand col — spans 1 column on desktop */}
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.75rem" }}>
+              <div style={{
+                width: "1.75rem", height: "1.75rem", borderRadius: "0.5rem",
+                background: "linear-gradient(135deg, #8b5cf6, #06b6d4)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <Sparkles style={{ width: "0.875rem", height: "0.875rem", color: "#fff" }} />
               </div>
-              <span className="font-semibold text-slate-100">
-                Nocodly <span className="gradient-text">AI</span>
+              <span style={{ fontWeight: 600, color: "#f1f5f9", fontSize: "0.9375rem" }}>
+                Nocodly{" "}
+                <span style={{ background: "linear-gradient(135deg, #8b5cf6, #06b6d4)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                  AI
+                </span>
               </span>
             </div>
-            <p className="text-xs text-slate-500 leading-relaxed max-w-[180px]">
+            <p style={{ fontSize: "0.75rem", color: "#475569", lineHeight: 1.6, maxWidth: "11rem", marginBottom: "1rem" }}>
               AI-powered SaaS platform for modern teams.
             </p>
-            <div className="flex items-center gap-3 mt-4">
-              <Link href="#" className="text-slate-500 hover:text-slate-300 transition-colors">
-                <ExternalLink className="w-4 h-4" />
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <Link href="#" style={{ color: "#475569", textDecoration: "none" }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = "#cbd5e1"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = "#475569"; }}
+              >
+                <ExternalLink style={{ width: "1rem", height: "1rem" }} />
               </Link>
-              <Link href="#" className="text-slate-500 hover:text-slate-300 transition-colors">
-                <AtSign className="w-4 h-4" />
+              <Link href="#" style={{ color: "#475569", textDecoration: "none" }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = "#cbd5e1"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = "#475569"; }}
+              >
+                <AtSign style={{ width: "1rem", height: "1rem" }} />
               </Link>
             </div>
           </div>
 
-          {/* Product */}
-          <div>
-            <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">Product</h4>
-            <ul className="space-y-2">
-              {["Features", "Pricing", "Changelog", "Roadmap"].map((item) => (
-                <li key={item}>
-                  <Link href="#" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
-                    {item}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Company */}
-          <div>
-            <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">Company</h4>
-            <ul className="space-y-2">
-              {["About", "Blog", "Careers", "Contact"].map((item) => (
-                <li key={item}>
-                  <Link href="#" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
-                    {item}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Legal */}
-          <div>
-            <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">Legal</h4>
-            <ul className="space-y-2">
-              {["Privacy", "Terms", "Security", "Cookies"].map((item) => (
-                <li key={item}>
-                  <Link href="#" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
-                    {item}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <FooterLinkList title="Product" links={PRODUCT_LINKS} />
+          <FooterLinkList title="Company" links={COMPANY_LINKS} />
+          <FooterLinkList title="Legal" links={LEGAL_LINKS} />
         </div>
 
-        <div className="border-t border-white/5 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-slate-600">
+        {/* Responsive overrides for mobile */}
+        <style>{`
+          @media (max-width: 767px) {
+            .footer-grid { grid-template-columns: 1fr 1fr !important; }
+          }
+        `}</style>
+
+        {/* Bottom bar */}
+        <div style={{
+          borderTop: "1px solid rgba(255,255,255,0.05)",
+          paddingTop: "1.5rem",
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "1rem",
+          flexWrap: "wrap",
+        }}>
+          <p style={{ fontSize: "0.75rem", color: "#334155" }}>
             © {new Date().getFullYear()} Nocodly AI. All rights reserved.
           </p>
-          <p className="text-xs text-slate-600">
-            Built with Next.js, Supabase & OpenAI
+          <p style={{ fontSize: "0.75rem", color: "#334155" }}>
+            Built with Next.js, Supabase &amp; OpenAI
           </p>
         </div>
       </div>
