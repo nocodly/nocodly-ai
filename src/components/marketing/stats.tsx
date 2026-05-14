@@ -3,18 +3,18 @@
 import { motion } from "framer-motion";
 
 const STATS = [
-  { value: "10M+", label: "Tokens generated" },
-  { value: "50K+", label: "Active users" },
+  { value: "500K+", label: "Tokens generated" },
+  { value: "2,400+", label: "Active users" },
   { value: "99.9%", label: "Uptime SLA" },
-  { value: "<200ms", label: "Avg response time" },
+  { value: "<180ms", label: "Avg response time" },
 ];
 
 export function StatsSection() {
   return (
-    <section className="py-16 border-y border-white/5 relative">
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-500/3 via-transparent to-cyan-500/3" />
+    <section style={{ position: "relative", borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "4rem 0" }}>
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(139,92,246,0.03), transparent, rgba(6,182,212,0.03))" }} />
       <div className="section-container">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "2rem" }}>
           {STATS.map(({ value, label }, i) => (
             <motion.div
               key={label}
@@ -22,10 +22,10 @@ export function StatsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.1 }}
-              className="text-center"
+              style={{ textAlign: "center" }}
             >
-              <div className="text-3xl sm:text-4xl font-bold gradient-text mb-1">{value}</div>
-              <div className="text-sm text-slate-500">{label}</div>
+              <div className="gradient-text" style={{ fontSize: "clamp(1.75rem, 4vw, 2.5rem)", fontWeight: 700, marginBottom: "0.25rem" }}>{value}</div>
+              <div style={{ fontSize: "0.875rem", color: "#64748b" }}>{label}</div>
             </motion.div>
           ))}
         </div>
