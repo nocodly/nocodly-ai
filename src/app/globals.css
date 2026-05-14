@@ -256,6 +256,15 @@ body {
   border-radius: 0.5rem;
 }
 
+/* ===== LAYOUT UTILITIES (Tailwind v4 override) ===== */
+.text-center { text-align: center !important; }
+.mx-auto { margin-left: auto !important; margin-right: auto !important; }
+.py-24 { padding-top: 6rem !important; padding-bottom: 6rem !important; }
+.py-16 { padding-top: 4rem !important; padding-bottom: 4rem !important; }
+.mb-16 { margin-bottom: 4rem !important; }
+.mb-14 { margin-bottom: 3.5rem !important; }
+.mb-8  { margin-bottom: 2rem !important; }
+
 /* Feature card icon colors */
 .feature-icon-purple {
   background: rgba(139,92,246,0.12);

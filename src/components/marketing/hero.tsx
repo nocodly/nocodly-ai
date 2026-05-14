@@ -7,7 +7,7 @@ import { ArrowRight, Sparkles, Zap, Shield } from "lucide-react";
 
 export function HeroSection() {
   return (
-    <section className="relative flex items-center justify-center pt-32 pb-16 overflow-hidden">
+    <section className="relative overflow-hidden" style={{ paddingTop: "8rem", paddingBottom: "4rem" }}>
       {/* Aurora background */}
       <div className="aurora" />
 
@@ -22,7 +22,7 @@ export function HeroSection() {
       <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-cyan-500/8 rounded-full blur-3xl pointer-events-none" />
 
       {/* Content */}
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center">
+      <div className="relative z-10" style={{ maxWidth: "64rem", margin: "0 auto", padding: "0 1.5rem", textAlign: "center" }}>
         {/* Badge */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
