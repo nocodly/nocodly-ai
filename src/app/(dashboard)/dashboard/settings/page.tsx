@@ -54,11 +54,12 @@ export default function SettingsPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data: prof } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: prof } = await (supabase as any)
         .from("profiles")
         .select("full_name, company")
         .eq("id", user.id)
-        .single();
+        .single() as { data: { full_name: string; company: string } | null };
 
       setProfile({
         fullName: prof?.full_name || user.user_metadata?.full_name || "",
@@ -76,7 +77,8 @@ export default function SettingsPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { error } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase as any)
         .from("profiles")
         .update({ full_name: profile.fullName, company: profile.company, updated_at: new Date().toISOString() })
         .eq("id", user.id);
