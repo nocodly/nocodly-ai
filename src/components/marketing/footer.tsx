@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Sparkles, ExternalLink, AtSign } from "lucide-react";
 

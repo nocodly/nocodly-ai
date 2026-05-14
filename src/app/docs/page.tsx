@@ -1,3 +1,5 @@
+"use client";
+
 import { PageWrapper } from "@/components/marketing/page-wrapper";
 
 const DOC_SECTIONS = [
