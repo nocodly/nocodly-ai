@@ -1,134 +1,178 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sparkles, Search, Copy, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { Sparkles, Search, Copy, Trash2, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/lib/supabase/client";
 import { formatDate, truncate } from "@/lib/utils";
 
-const MOCK_HISTORY = [
-  { id: "1", prompt: "Write a product launch email for a B2B SaaS tool targeting project managers", output: "Subject: Introducing the Project Tool That Your Team Actually Wants to Use\n\nHi [First Name],\n\nWe know you're busy. Your team is busy. And the last thing anyone needs is another tool that takes weeks to learn and months to adopt.\n\nThat's why we built [Product Name] differently...", tokens: 420, model: "gpt-4o-mini", created_at: new Date(Date.now() - 7200000).toISOString() },
-  { id: "2", prompt: "Generate 5 LinkedIn post ideas about remote work productivity", output: "1. The 'No-Meeting Wednesday' experiment: How our team 2x'd deep work output in 30 days\n\n2. Remote work myths debunked: Why your best employees don't need to be in the office to do their best work\n\n3. The virtual water cooler problem: 3 creative ways we've built team culture without a physical office...", tokens: 280, model: "gpt-4o-mini", created_at: new Date(Date.now() - 18000000).toISOString() },
-  { id: "3", prompt: "Create a landing page hero copy for Nocodly AI, a SaaS dashboard", output: "Headline: AI that works as fast as you think\n\nSubheadline: Nocodly AI turns your ideas into polished content, code, and copy — in seconds. No prompt engineering degree required.\n\nCTA: Start generating for free →\n\nSocial proof: Trusted by 10,000+ builders and creators", tokens: 510, model: "gpt-4o-mini", created_at: new Date(Date.now() - 86400000).toISOString() },
-  { id: "4", prompt: "Summarize this quarterly report in 3 bullet points", output: "• Revenue grew 34% YoY, driven by enterprise expansion and new mid-market acquisitions in EMEA.\n• Customer acquisition cost (CAC) decreased by 18% following optimization of paid channels and referral program launch.\n• Churn rate stabilized at 2.1% MoM after customer success team expansion and proactive health-score monitoring.", tokens: 190, model: "gpt-4o-mini", created_at: new Date(Date.now() - 172800000).toISOString() },
-];
+interface Generation {
+  id: string;
+  prompt: string;
+  output: string;
+  tokens_used: number;
+  model: string;
+  created_at: string;
+}
 
 export default function HistoryPage() {
+  const [history, setHistory] = useState<Generation[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
-  const filtered = MOCK_HISTORY.filter(
-    (item) =>
-      item.prompt.toLowerCase().includes(search.toLowerCase()) ||
-      item.output.toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => {
+    const load = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from("generations")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+      setHistory(data || []);
+      setLoading(false);
+    };
+    load();
+  }, []);
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success("Copied to clipboard!");
   };
 
-  return (
-    <div className="max-w-4xl">
-      <DashboardHeader
-        title="Generation History"
-        description="Browse and search all your past AI generations."
-      />
+  const handleDelete = async (id: string) => {
+    setDeleting(id);
+    const { error } = await supabase.from("generations").delete().eq("id", id);
+    if (error) {
+      toast.error("Failed to delete");
+    } else {
+      setHistory((prev) => prev.filter((item) => item.id !== id));
+      toast.success("Deleted");
+    }
+    setDeleting(null);
+  };
 
-      {/* Search + filter */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+  const filtered = history.filter(
+    (item) =>
+      item.prompt.toLowerCase().includes(search.toLowerCase()) ||
+      item.output.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div style={{ maxWidth: "56rem" }}>
+      <DashboardHeader title="Generation History" description="Browse and search all your past AI generations." />
+
+      {/* Search */}
+      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.5rem" }}>
+        <div style={{ position: "relative", flex: 1 }}>
+          <Search style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", width: "1rem", height: "1rem", color: "#64748b" }} />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search prompts or outputs..."
-            className="pl-9"
+            style={{ paddingLeft: "2.25rem" }}
           />
         </div>
-        <Badge variant="default">{filtered.length} results</Badge>
+        {!loading && <Badge variant="default">{filtered.length} results</Badge>}
       </div>
 
-      {/* History list */}
-      <div className="space-y-3">
-        {filtered.length === 0 ? (
-          <Card>
-            <CardContent className="py-16 text-center">
-              <div className="w-12 h-12 rounded-full bg-white/3 border border-white/8 flex items-center justify-center mx-auto mb-3">
-                <Sparkles className="w-5 h-5 text-slate-600" />
-              </div>
-              <p className="text-slate-500 text-sm">No generations found</p>
-              <Button variant="outline" size="sm" className="mt-4" asChild>
+      {/* List */}
+      {loading ? (
+        <div style={{ display: "flex", justifyContent: "center", padding: "4rem" }}>
+          <Loader2 style={{ width: "2rem", height: "2rem", color: "#a78bfa", animation: "spin 1s linear infinite" }} />
+        </div>
+      ) : filtered.length === 0 ? (
+        <Card>
+          <CardContent style={{ paddingTop: "4rem", paddingBottom: "4rem", textAlign: "center" }}>
+            <div style={{ width: "3rem", height: "3rem", borderRadius: "50%", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 0.75rem" }}>
+              <Sparkles style={{ width: "1.25rem", height: "1.25rem", color: "#334155" }} />
+            </div>
+            <p style={{ color: "#64748b", fontSize: "0.875rem", marginBottom: "1rem" }}>
+              {search ? "No results found" : "No generations yet"}
+            </p>
+            {!search && (
+              <Button variant="outline" size="sm" asChild>
                 <a href="/dashboard/generate">Create your first generation</a>
               </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          filtered.map((item, i) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2, delay: i * 0.05 }}
-            >
-              <Card>
-                <CardContent>
-                  {/* Header row */}
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-200 leading-snug">
-                        {expanded === item.id ? item.prompt : truncate(item.prompt, 90)}
-                      </p>
-                      <div className="flex items-center gap-2 mt-1.5">
-                        <span className="text-xs text-slate-600">{formatDate(item.created_at)}</span>
-                        <span className="text-slate-700">·</span>
-                        <Badge variant="info">{item.tokens} tokens</Badge>
-                        <Badge variant="default">{item.model}</Badge>
+            )}
+          </CardContent>
+        </Card>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+          <AnimatePresence>
+            {filtered.map((item, i) => (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                transition={{ duration: 0.2, delay: i < 10 ? i * 0.04 : 0 }}
+              >
+                <Card>
+                  <CardContent>
+                    {/* Header row */}
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem" }}>
+                      <div style={{ width: "2rem", height: "2rem", borderRadius: "0.5rem", background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "0.125rem" }}>
+                        <Sparkles style={{ width: "0.875rem", height: "0.875rem", color: "#a78bfa" }} />
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontSize: "0.875rem", fontWeight: 500, color: "#e2e8f0", lineHeight: 1.4 }}>
+                          {expanded === item.id ? item.prompt : truncate(item.prompt, 90)}
+                        </p>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.375rem", flexWrap: "wrap" }}>
+                          <span style={{ fontSize: "0.7rem", color: "#334155" }}>{formatDate(item.created_at)}</span>
+                          <span style={{ color: "#1e293b" }}>·</span>
+                          <Badge variant="info">{item.tokens_used} tokens</Badge>
+                          <Badge variant="default">{item.model}</Badge>
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", flexShrink: 0 }}>
+                        <button onClick={() => handleCopy(item.output)} style={{ width: "1.75rem", height: "1.75rem", borderRadius: "0.5rem", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569", background: "none", border: "none", cursor: "pointer", transition: "all 0.15s" }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = "#e2e8f0"; e.currentTarget.style.background = "rgba(255,255,255,0.05)"; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = "#475569"; e.currentTarget.style.background = "none"; }}>
+                          <Copy style={{ width: "0.875rem", height: "0.875rem" }} />
+                        </button>
+                        <button onClick={() => handleDelete(item.id)} disabled={deleting === item.id} style={{ width: "1.75rem", height: "1.75rem", borderRadius: "0.5rem", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569", background: "none", border: "none", cursor: "pointer", transition: "all 0.15s", opacity: deleting === item.id ? 0.5 : 1 }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = "#f87171"; e.currentTarget.style.background = "rgba(239,68,68,0.05)"; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = "#475569"; e.currentTarget.style.background = "none"; }}>
+                          {deleting === item.id ? <Loader2 style={{ width: "0.875rem", height: "0.875rem", animation: "spin 1s linear infinite" }} /> : <Trash2 style={{ width: "0.875rem", height: "0.875rem" }} />}
+                        </button>
+                        <button onClick={() => setExpanded(expanded === item.id ? null : item.id)} style={{ width: "1.75rem", height: "1.75rem", borderRadius: "0.5rem", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569", background: "none", border: "none", cursor: "pointer", transition: "all 0.15s" }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = "#e2e8f0"; e.currentTarget.style.background = "rgba(255,255,255,0.05)"; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = "#475569"; e.currentTarget.style.background = "none"; }}>
+                          {expanded === item.id ? <ChevronUp style={{ width: "0.875rem", height: "0.875rem" }} /> : <ChevronDown style={{ width: "0.875rem", height: "0.875rem" }} />}
+                        </button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <button
-                        onClick={() => handleCopy(item.output)}
-                        className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-200 hover:bg-white/5 transition-all"
-                      >
-                        <Copy className="w-3.5 h-3.5" />
-                      </button>
-                      <button className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-red-500/5 transition-all">
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => setExpanded(expanded === item.id ? null : item.id)}
-                        className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-200 hover:bg-white/5 transition-all"
-                      >
-                        {expanded === item.id ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
-                  </div>
 
-                  {/* Expanded output */}
-                  {expanded === item.id && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      className="mt-4 p-4 rounded-xl bg-white/2 border border-white/5 text-sm text-slate-400 leading-relaxed whitespace-pre-wrap"
-                    >
-                      {item.output}
-                    </motion.div>
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))
-        )}
-      </div>
+                    {/* Expanded output */}
+                    {expanded === item.id && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        style={{ marginTop: "1rem", padding: "1rem", borderRadius: "0.75rem", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", fontSize: "0.875rem", color: "#94a3b8", lineHeight: 1.7, whiteSpace: "pre-wrap", maxHeight: "20rem", overflowY: "auto" }}
+                      >
+                        {item.output}
+                      </motion.div>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+      )}
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
