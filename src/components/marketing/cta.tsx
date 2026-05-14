@@ -7,13 +7,14 @@ import { ArrowRight, Sparkles } from "lucide-react";
 
 export function CtaSection() {
   return (
-    <section className="py-24 px-4 sm:px-6">
-      <div className="max-w-4xl mx-auto">
+    <section className="py-24" style={{ padding: "6rem 1.5rem" }}>
+      <div style={{ maxWidth: "56rem", marginLeft: "auto", marginRight: "auto" }}>
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="relative glass rounded-2xl p-10 sm:p-16 text-center overflow-hidden border border-purple-500/15"
+          className="relative glass rounded-2xl overflow-hidden border border-purple-500/15"
+          style={{ padding: "4rem", textAlign: "center" }}
         >
           {/* Background glow */}
           <div className="absolute inset-0 bg-gradient-to-br from-purple-500/8 via-transparent to-cyan-500/8" />

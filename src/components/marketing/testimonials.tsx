@@ -30,7 +30,7 @@ export function TestimonialsSection() {
   return (
     <section className="py-24 relative">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500/3 to-transparent pointer-events-none" />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="section-container">
         <div className="text-center mb-14">
           <motion.h2
             initial={{ opacity: 0, y: 16 }}

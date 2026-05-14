@@ -56,21 +56,21 @@ const FEATURES = [
 
 const colorMap = {
   purple: {
-    icon: "bg-purple-500/12 text-purple-400 border-purple-500/20",
-    glow: "hover:shadow-[0_0_30px_rgba(139,92,246,0.08)]",
+    icon: "feature-icon-purple",
+    glow: "feature-glow-purple",
   },
   cyan: {
-    icon: "bg-cyan-500/12 text-cyan-400 border-cyan-500/20",
-    glow: "hover:shadow-[0_0_30px_rgba(6,182,212,0.08)]",
+    icon: "feature-icon-cyan",
+    glow: "feature-glow-cyan",
   },
 };
 
 export function FeaturesSection() {
   return (
     <section id="features" className="py-24 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="section-container">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div style={{ textAlign: "center", marginBottom: "4rem" }}>
           <motion.span
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}

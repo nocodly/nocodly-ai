@@ -13,7 +13,7 @@ export function StatsSection() {
   return (
     <section className="py-16 border-y border-white/5 relative">
       <div className="absolute inset-0 bg-gradient-to-r from-purple-500/3 via-transparent to-cyan-500/3" />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="section-container">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
           {STATS.map(({ value, label }, i) => (
             <motion.div
