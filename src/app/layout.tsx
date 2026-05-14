@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
@@ -51,9 +52,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="antialiased min-h-screen">
         <Providers>{children}</Providers>
-        {/* Nocodly widget */}
-        <script src="https://api.nocodly.com/widget/sync.js?bot=q518o6hq8120f3n" async />
-        <script src="https://api.nocodly.com/widget/embed/q518o6hq8120f3n" />
+        <Script src="https://api.nocodly.com/widget/sync.js?bot=q518o6hq8120f3n" strategy="afterInteractive" />
+        <Script src="https://api.nocodly.com/widget/embed/q518o6hq8120f3n" strategy="afterInteractive" />
       </body>
     </html>
   );
