@@ -35,6 +35,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const {
     register,
@@ -60,42 +61,118 @@ export default function RegisterPage() {
     }
   };
 
+  const signInWithGoogle = async () => {
+    setGoogleLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) throw error;
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Google sign-in failed");
+      setGoogleLoading(false);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="w-full max-w-sm"
+      style={{ width: "100%", maxWidth: "24rem" }}
     >
-      <div className="glass rounded-2xl p-8 border border-purple-500/12 shadow-2xl shadow-black/50">
+      <div className="glass rounded-2xl border border-purple-500/12 shadow-2xl shadow-black/50" style={{ padding: "2rem" }}>
         {/* Header */}
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-slate-100 mb-1">Create your account</h1>
+        <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+          <h1 className="text-2xl font-bold text-slate-100" style={{ marginBottom: "0.25rem" }}>Create your account</h1>
           <p className="text-sm text-slate-500">Start generating with AI in seconds</p>
         </div>
 
         {/* Perks */}
-        <div className="flex flex-col gap-1.5 mb-6 p-3 rounded-xl bg-purple-500/6 border border-purple-500/12">
+        <div
+          className="rounded-xl"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.375rem",
+            marginBottom: "1.5rem",
+            padding: "0.75rem",
+            background: "rgba(139,92,246,0.06)",
+            border: "1px solid rgba(139,92,246,0.12)",
+          }}
+        >
           {PERKS.map((perk) => (
-            <div key={perk} className="flex items-center gap-2 text-xs text-slate-400">
-              <Check className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
+            <div key={perk} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }} className="text-xs text-slate-400">
+              <Check style={{ width: "0.875rem", height: "0.875rem", flexShrink: 0 }} className="text-purple-400" />
               {perk}
             </div>
           ))}
         </div>
 
+        {/* Google OAuth */}
+        <button
+          type="button"
+          onClick={signInWithGoogle}
+          disabled={googleLoading}
+          style={{
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.625rem",
+            padding: "0.625rem 1rem",
+            marginBottom: "1rem",
+            background: "rgba(255,255,255,0.05)",
+            border: "1px solid rgba(255,255,255,0.12)",
+            borderRadius: "0.5rem",
+            color: "#e2e8f0",
+            fontSize: "0.875rem",
+            fontWeight: 500,
+            cursor: googleLoading ? "not-allowed" : "pointer",
+            opacity: googleLoading ? 0.6 : 1,
+            transition: "all 0.2s ease",
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.09)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; }}
+        >
+          {googleLoading ? (
+            <Loader2 style={{ width: "1rem", height: "1rem", animation: "spin 1s linear infinite" }} />
+          ) : (
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
+              <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
+              <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+              <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+            </svg>
+          )}
+          Continue with Google
+        </button>
+
+        {/* Divider */}
+        <div style={{ position: "relative", marginBottom: "1rem" }}>
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center" }}>
+            <div style={{ width: "100%", borderTop: "1px solid rgba(255,255,255,0.08)" }} />
+          </div>
+          <div style={{ position: "relative", display: "flex", justifyContent: "center" }}>
+            <span style={{ background: "#0f0f1a", padding: "0 0.75rem", fontSize: "0.75rem", color: "#475569" }}>or</span>
+          </div>
+        </div>
+
         {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Full name</label>
+            <label className="block text-xs font-medium text-slate-400" style={{ marginBottom: "0.375rem" }}>Full name</label>
             <Input {...register("fullName")} placeholder="John Doe" autoComplete="name" />
             {errors.fullName && (
-              <p className="text-xs text-red-400 mt-1">{errors.fullName.message}</p>
+              <p className="text-xs text-red-400" style={{ marginTop: "0.25rem" }}>{errors.fullName.message}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Email</label>
+            <label className="block text-xs font-medium text-slate-400" style={{ marginBottom: "0.375rem" }}>Email</label>
             <Input
               {...register("email")}
               type="email"
@@ -103,13 +180,13 @@ export default function RegisterPage() {
               autoComplete="email"
             />
             {errors.email && (
-              <p className="text-xs text-red-400 mt-1">{errors.email.message}</p>
+              <p className="text-xs text-red-400" style={{ marginTop: "0.25rem" }}>{errors.email.message}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Password</label>
-            <div className="relative">
+            <label className="block text-xs font-medium text-slate-400" style={{ marginBottom: "0.375rem" }}>Password</label>
+            <div style={{ position: "relative" }}>
               <Input
                 {...register("password")}
                 type={showPassword ? "text" : "password"}
@@ -119,13 +196,22 @@ export default function RegisterPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                style={{
+                  position: "absolute",
+                  right: "0.75rem",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#64748b",
+                }}
               >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPassword ? <EyeOff style={{ width: "1rem", height: "1rem" }} /> : <Eye style={{ width: "1rem", height: "1rem" }} />}
               </button>
             </div>
             {errors.password && (
-              <p className="text-xs text-red-400 mt-1">{errors.password.message}</p>
+              <p className="text-xs text-red-400" style={{ marginTop: "0.25rem" }}>{errors.password.message}</p>
             )}
           </div>
 
@@ -138,14 +224,14 @@ export default function RegisterPage() {
           </Button>
         </form>
 
-        <p className="text-center text-xs text-slate-600 mt-4">
+        <p style={{ textAlign: "center", fontSize: "0.75rem", color: "#475569", marginTop: "1rem" }}>
           By signing up you agree to our{" "}
           <Link href="#" className="text-slate-500 hover:text-slate-300 underline">Terms</Link>
           {" & "}
           <Link href="#" className="text-slate-500 hover:text-slate-300 underline">Privacy Policy</Link>
         </p>
 
-        <p className="text-center text-sm text-slate-500 mt-5">
+        <p style={{ textAlign: "center", fontSize: "0.875rem", color: "#64748b", marginTop: "1.25rem" }}>
           Already have an account?{" "}
           <Link href="/login" className="text-purple-400 hover:text-purple-300 font-medium transition-colors">
             Sign in
