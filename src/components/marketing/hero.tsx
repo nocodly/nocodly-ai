@@ -7,7 +7,7 @@ import { ArrowRight, Sparkles, Zap, Shield } from "lucide-react";
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
+    <section className="relative flex items-center justify-center pt-32 pb-16 overflow-hidden">
       {/* Aurora background */}
       <div className="aurora" />
 
