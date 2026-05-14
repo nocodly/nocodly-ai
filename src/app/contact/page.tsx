@@ -7,7 +7,7 @@ const INFO_CARDS = [
   {
     icon: "✉️",
     title: "Email us",
-    detail: "hello@nocodly.ai",
+    detail: "support@nocodly.com",
     sub: "We read every message",
   },
   {

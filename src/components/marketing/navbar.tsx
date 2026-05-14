@@ -28,10 +28,11 @@ export function Navbar() {
       right: 0,
       zIndex: 50,
       transition: "all 0.3s ease",
-      background: scrolled ? "rgba(9,9,15,0.9)" : "transparent",
-      backdropFilter: scrolled ? "blur(20px)" : "none",
-      borderBottom: scrolled ? "1px solid rgba(255,255,255,0.05)" : "none",
-      boxShadow: scrolled ? "0 4px 24px rgba(0,0,0,0.2)" : "none",
+      background: scrolled ? "rgba(9,9,15,0.95)" : "transparent",
+      backdropFilter: scrolled ? "blur(16px)" : "none",
+      WebkitBackdropFilter: scrolled ? "blur(16px)" : "none",
+      borderBottom: scrolled ? "1px solid rgba(255,255,255,0.06)" : "none",
+      boxShadow: scrolled ? "0 1px 0 rgba(255,255,255,0.04)" : "none",
     }}>
       <nav style={{ maxWidth: "80rem", margin: "0 auto", padding: "0 1.5rem", height: "4rem", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
 

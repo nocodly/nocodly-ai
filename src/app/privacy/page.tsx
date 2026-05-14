@@ -19,7 +19,7 @@ const SECTIONS = [
   },
   {
     title: "Your Rights",
-    content: `Depending on your location, you may have rights to access, correct, or delete your personal data. EU and UK residents have rights under GDPR, including the right to data portability and to object to processing. To exercise your rights, contact us at privacy@nocodly.ai. We will respond within 30 days.`,
+    content: `Depending on your location, you may have rights to access, correct, or delete your personal data. EU and UK residents have rights under GDPR, including the right to data portability and to object to processing. To exercise your rights, contact us at support@nocodly.com. We will respond within 30 days.`,
   },
   {
     title: "Cookies",
@@ -31,7 +31,7 @@ const SECTIONS = [
   },
   {
     title: "Contact",
-    content: `If you have questions about this Privacy Policy or how we handle your data, please contact us at privacy@nocodly.ai. For general inquiries, visit our Contact page or join our Discord community.`,
+    content: `If you have questions about this Privacy Policy or how we handle your data, please contact us at support@nocodly.com. For general inquiries, visit our Contact page or join our Discord community.`,
   },
 ];
 
@@ -92,7 +92,7 @@ export default function PrivacyPage() {
           <span style={{ fontSize: "1.5rem" }}>📬</span>
           <div style={{ flex: 1 }}>
             <p style={{ color: "#f1f5f9", fontWeight: 600, marginBottom: "0.25rem", fontSize: "0.9375rem" }}>Questions about your data?</p>
-            <p style={{ color: "#94a3b8", fontSize: "0.875rem" }}>Email us at <span style={{ color: "#8b5cf6" }}>privacy@nocodly.ai</span> and we&apos;ll respond within 30 days.</p>
+            <p style={{ color: "#94a3b8", fontSize: "0.875rem" }}>Email us at <span style={{ color: "#8b5cf6" }}>support@nocodly.com</span> and we&apos;ll respond within 30 days.</p>
           </div>
         </div>
       </div>

@@ -135,7 +135,7 @@ export default function SecurityPage() {
           <p style={{ color: "#94a3b8", marginBottom: "1.25rem", fontSize: "0.9375rem", maxWidth: "32rem", margin: "0 auto 1.25rem" }}>
             We appreciate responsible disclosure. If you discover a security issue, please report it to us privately before making it public.
           </p>
-          <a href="mailto:security@nocodly.ai" style={{
+          <a href="mailto:support@nocodly.com" style={{
             display: "inline-flex", alignItems: "center", gap: "0.5rem",
             background: "linear-gradient(135deg, #8b5cf6, #06b6d4)",
             color: "#fff", fontWeight: 600, fontSize: "0.9375rem",

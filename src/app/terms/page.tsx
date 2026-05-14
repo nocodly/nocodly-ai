@@ -35,7 +35,7 @@ const SECTIONS = [
   },
   {
     title: "Contact",
-    content: `For questions about these Terms of Service, contact us at legal@nocodly.ai or visit our Contact page. We aim to respond to all legal inquiries within 5 business days.`,
+    content: `For questions about these Terms of Service, contact us at support@nocodly.com or visit our Contact page. We aim to respond to all legal inquiries within 5 business days.`,
   },
 ];
 
@@ -104,7 +104,7 @@ export default function TermsPage() {
           <span style={{ fontSize: "1.5rem" }}>📋</span>
           <div style={{ flex: 1 }}>
             <p style={{ color: "#f1f5f9", fontWeight: 600, marginBottom: "0.25rem", fontSize: "0.9375rem" }}>Questions about these terms?</p>
-            <p style={{ color: "#94a3b8", fontSize: "0.875rem" }}>Email us at <span style={{ color: "#8b5cf6" }}>legal@nocodly.ai</span> and we&apos;ll respond promptly.</p>
+            <p style={{ color: "#94a3b8", fontSize: "0.875rem" }}>Email us at <span style={{ color: "#8b5cf6" }}>support@nocodly.com</span> and we&apos;ll respond promptly.</p>
           </div>
         </div>
       </div>

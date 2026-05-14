@@ -111,7 +111,7 @@ export default function CookiesPage() {
             You can control cookies through your browser settings. Most browsers allow you to block or delete cookies. Note that blocking essential cookies will prevent Nocodly AI from working correctly.
           </p>
           <p style={{ fontSize: "0.9375rem", color: "#94a3b8", lineHeight: 1.7, margin: 0 }}>
-            For questions about our cookie use, contact us at <span style={{ color: "#8b5cf6" }}>privacy@nocodly.ai</span>.
+            For questions about our cookie use, contact us at <span style={{ color: "#8b5cf6" }}>support@nocodly.com</span>.
           </p>
         </div>
       </div>
