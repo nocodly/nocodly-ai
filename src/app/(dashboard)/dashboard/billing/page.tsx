@@ -1,27 +1,54 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Check, Zap, Sparkles, CreditCard, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/lib/supabase/client";
 import { PLANS } from "@/lib/stripe";
-// PLANS is a static const — no server client needed
 
-const CURRENT_PLAN = "free";
+interface Usage {
+  total_generations: number;
+  tokens_used: number;
+}
 
 export default function BillingPage() {
-  const [loading, setLoading] = useState<string | null>(null);
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [usage, setUsage] = useState<Usage>({ total_generations: 0, tokens_used: 0 });
+  const [loadingUsage, setLoadingUsage] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await (supabase as any)
+        .from("usage_tracking")
+        .select("total_generations, tokens_used")
+        .eq("user_id", user.id)
+        .single() as { data: Usage | null };
+      if (data) setUsage(data);
+      setLoadingUsage(false);
+    };
+    load();
+  }, []);
 
   const handleCheckout = async (priceId: string, planKey: string) => {
-    setLoading(planKey);
+    if (!priceId) {
+      toast.info("Stripe payments coming soon! Contact support@nocodly.com to upgrade.");
+      return;
+    }
+    setLoadingPlan(planKey);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(session?.access_token ? { "Authorization": `Bearer ${session.access_token}` } : {}),
+        },
         body: JSON.stringify({ priceId }),
       });
       const data = await res.json();
@@ -30,123 +57,125 @@ export default function BillingPage() {
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
     } finally {
-      setLoading(null);
+      setLoadingPlan(null);
     }
   };
 
+  const genLimit = 10;
+  const tokenLimit = 5000;
+  const genPct = Math.min(Math.round((usage.total_generations / genLimit) * 100), 100);
+  const tokenPct = Math.min(Math.round((usage.tokens_used / tokenLimit) * 100), 100);
+
   return (
-    <div className="max-w-4xl">
-      <DashboardHeader
-        title="Billing & Plans"
-        description="Manage your subscription and usage limits."
-      />
+    <div style={{ maxWidth: "56rem" }}>
+      <DashboardHeader title="Billing & Plans" description="Manage your subscription and usage limits." />
 
-      {/* Current plan card */}
-      <Card className="mb-8">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-purple-400" />
-              Current Plan
-            </CardTitle>
-            <Badge variant="default">Active</Badge>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between p-4 rounded-xl bg-white/2 border border-white/5">
-            <div>
-              <div className="text-lg font-bold text-slate-100 mb-1">Free Tier</div>
-              <div className="text-sm text-slate-500">10 generations · 5K tokens per month</div>
+      {/* Current plan */}
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+        <Card style={{ marginBottom: "2rem" }}>
+          <CardHeader>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <CardTitle style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <CreditCard style={{ width: "1rem", height: "1rem", color: "#a78bfa" }} />
+                Current Plan
+              </CardTitle>
+              <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#22d3ee", background: "rgba(6,182,212,0.1)", padding: "0.25rem 0.625rem", borderRadius: "9999px", border: "1px solid rgba(6,182,212,0.2)" }}>
+                Active
+              </span>
             </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-slate-100">$0</div>
-              <div className="text-xs text-slate-500">/ month</div>
+          </CardHeader>
+          <CardContent>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1rem 1.25rem", borderRadius: "0.875rem", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", marginBottom: "1.25rem" }}>
+              <div>
+                <div style={{ fontSize: "1.125rem", fontWeight: 700, color: "#f1f5f9", marginBottom: "0.25rem" }}>Free Tier</div>
+                <div style={{ fontSize: "0.8125rem", color: "#475569" }}>10 generations · 5K tokens per month</div>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontSize: "1.75rem", fontWeight: 800, color: "#f1f5f9" }}>$0</div>
+                <div style={{ fontSize: "0.75rem", color: "#475569" }}>/ month</div>
+              </div>
             </div>
-          </div>
 
-          {/* Usage */}
-          <div className="mt-4 space-y-3">
-            <div>
-              <div className="flex justify-between text-xs text-slate-500 mb-1.5">
-                <span>Generations used</span>
-                <span className="text-slate-300">3 / 10</span>
+            {loadingUsage ? (
+              <div style={{ display: "flex", justifyContent: "center", padding: "1rem" }}>
+                <Loader2 style={{ width: "1.25rem", height: "1.25rem", color: "#a78bfa", animation: "spin 1s linear infinite" }} />
               </div>
-              <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full w-[30%] rounded-full bg-gradient-to-r from-purple-500 to-cyan-500" />
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", color: "#475569", marginBottom: "0.375rem" }}>
+                    <span>Generations used</span>
+                    <span style={{ color: "#cbd5e1" }}>{usage.total_generations} / {genLimit}</span>
+                  </div>
+                  <div style={{ width: "100%", height: "0.5rem", background: "rgba(255,255,255,0.05)", borderRadius: "9999px", overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: `${genPct}%`, background: "linear-gradient(to right,#8b5cf6,#06b6d4)", borderRadius: "9999px", transition: "width 0.5s ease" }} />
+                  </div>
+                </div>
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", color: "#475569", marginBottom: "0.375rem" }}>
+                    <span>Tokens used</span>
+                    <span style={{ color: "#cbd5e1" }}>{usage.tokens_used.toLocaleString()} / {tokenLimit.toLocaleString()}</span>
+                  </div>
+                  <div style={{ width: "100%", height: "0.5rem", background: "rgba(255,255,255,0.05)", borderRadius: "9999px", overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: `${tokenPct}%`, background: "linear-gradient(to right,#8b5cf6,#06b6d4)", borderRadius: "9999px", transition: "width 0.5s ease" }} />
+                  </div>
+                </div>
               </div>
-            </div>
-            <div>
-              <div className="flex justify-between text-xs text-slate-500 mb-1.5">
-                <span>Tokens used</span>
-                <span className="text-slate-300">890 / 5K</span>
-              </div>
-              <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full w-[18%] rounded-full bg-gradient-to-r from-purple-500 to-cyan-500" />
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
 
-      {/* Plans */}
-      <h2 className="text-lg font-semibold text-slate-200 mb-4">Upgrade your plan</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      {/* Upgrade plans */}
+      <p style={{ fontSize: "1.0625rem", fontWeight: 600, color: "#e2e8f0", marginBottom: "1rem" }}>Upgrade your plan</p>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem" }} className="billing-grid">
         {Object.entries(PLANS).map(([key, plan], i) => {
           const isPro = key === "pro";
           return (
-            <motion.div
-              key={key}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: i * 0.1 }}
-            >
-              <Card
-                className={`relative overflow-hidden ${isPro ? "border-purple-500/30 shadow-[0_0_40px_rgba(139,92,246,0.1)]" : ""}`}
-              >
+            <motion.div key={key} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} style={{ display: "flex" }}>
+              <Card style={{
+                position: "relative", flex: 1,
+                border: isPro ? "1px solid rgba(139,92,246,0.25)" : undefined,
+                boxShadow: isPro ? "0 0 40px rgba(139,92,246,0.1)" : undefined,
+              }}>
                 {isPro && (
                   <>
-                    <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent" />
-                    <div className="absolute top-4 right-4">
-                      <Badge>Most Popular</Badge>
-                    </div>
+                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg,transparent,rgba(139,92,246,0.5),transparent)", borderRadius: "0.75rem 0.75rem 0 0" }} />
+                    <div style={{ position: "absolute", top: "1rem", right: "1rem", fontSize: "0.6875rem", fontWeight: 700, color: "#a78bfa", background: "rgba(139,92,246,0.15)", padding: "0.25rem 0.625rem", borderRadius: "9999px", border: "1px solid rgba(139,92,246,0.3)" }}>Most Popular</div>
                   </>
                 )}
                 <CardHeader>
-                  <div className="flex items-center gap-2 mb-1">
-                    {isPro ? (
-                      <Sparkles className="w-4 h-4 text-purple-400" />
-                    ) : (
-                      <Zap className="w-4 h-4 text-cyan-400" />
-                    )}
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                    {isPro
+                      ? <Sparkles style={{ width: "1rem", height: "1rem", color: "#a78bfa" }} />
+                      : <Zap style={{ width: "1rem", height: "1rem", color: "#22d3ee" }} />
+                    }
                     <CardTitle>{plan.name}</CardTitle>
                   </div>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-bold text-slate-100">${plan.price}</span>
-                    <span className="text-slate-500 text-sm">/ month</span>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: "0.25rem" }}>
+                    <span style={{ fontSize: "2rem", fontWeight: 800, color: "#f1f5f9" }}>${plan.price}</span>
+                    <span style={{ fontSize: "0.875rem", color: "#475569" }}>/ month</span>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <ul className="space-y-2 mb-6">
-                    {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-center gap-2 text-sm text-slate-400">
-                        <Check className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
-                        {feature}
+                  <ul style={{ listStyle: "none", padding: 0, margin: "0 0 1.5rem", display: "flex", flexDirection: "column", gap: "0.625rem" }}>
+                    {plan.features.map((f) => (
+                      <li key={f} style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem", color: "#94a3b8" }}>
+                        <Check style={{ width: "0.875rem", height: "0.875rem", color: "#8b5cf6", flexShrink: 0 }} />
+                        {f}
                       </li>
                     ))}
                   </ul>
                   <Button
-                    className="w-full"
+                    style={{ width: "100%", justifyContent: "center", display: "flex", alignItems: "center", gap: "0.375rem" }}
                     variant={isPro ? "default" : "outline"}
                     onClick={() => handleCheckout(plan.priceId, key)}
-                    disabled={loading === key || CURRENT_PLAN === key}
+                    disabled={loadingPlan === key}
                   >
-                    {loading === key ? (
-                      <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
-                    ) : CURRENT_PLAN === key ? (
-                      "Current Plan"
-                    ) : (
-                      <>Upgrade to {plan.name} <ArrowRight className="w-4 h-4" /></>
-                    )}
+                    {loadingPlan === key
+                      ? <><Loader2 style={{ width: "1rem", height: "1rem", animation: "spin 1s linear infinite" }} /> Processing...</>
+                      : <>Upgrade to {plan.name} <ArrowRight style={{ width: "1rem", height: "1rem" }} /></>
+                    }
                   </Button>
                 </CardContent>
               </Card>
@@ -156,16 +185,21 @@ export default function BillingPage() {
       </div>
 
       {/* Billing history */}
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle>Billing History</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-10 text-slate-600 text-sm">
-            No invoices yet. They&apos;ll appear here once you subscribe.
-          </div>
-        </CardContent>
-      </Card>
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} style={{ marginTop: "2rem" }}>
+        <Card>
+          <CardHeader><CardTitle>Billing History</CardTitle></CardHeader>
+          <CardContent>
+            <div style={{ textAlign: "center", padding: "2.5rem 0", fontSize: "0.875rem", color: "#334155" }}>
+              No invoices yet. They&apos;ll appear here once you subscribe.
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 640px) { .billing-grid { grid-template-columns: 1fr !important; } }
+      `}</style>
     </div>
   );
 }

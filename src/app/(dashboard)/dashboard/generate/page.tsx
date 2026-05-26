@@ -11,6 +11,7 @@ import {
   Sparkles, Copy, Download, RefreshCw, Loader2, Zap, ChevronDown,
   Clock, Image, Mic, Code2, Globe, Layers,
 } from "lucide-react";
+import { supabase } from "@/lib/supabase/client";
 
 const TEMPLATES = [
   { label: "Blog Post Intro", prompt: "Write an engaging introduction for a blog post about {topic}. Make it hook the reader immediately." },
@@ -48,9 +49,13 @@ export default function GeneratePage() {
     if (!prompt.trim()) { toast.error("Please enter a prompt first"); return; }
     setLoading(true); setOutput("");
     try {
+      const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch("/api/generate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(session?.access_token ? { "Authorization": `Bearer ${session.access_token}` } : {}),
+        },
         body: JSON.stringify({ prompt }),
       });
       if (!res.ok) { const err = await res.json(); throw new Error(err.error ?? "Generation failed"); }
