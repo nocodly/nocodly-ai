@@ -1,7 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
-
 const TESTIMONIALS = [
   {
     text: "Nocodly AI cut our content creation time by 70%. The dashboard is incredibly intuitive — we onboarded our whole team in an afternoon.",
@@ -28,59 +26,91 @@ const TESTIMONIALS = [
 
 export function TestimonialsSection() {
   return (
-    <section className="py-24 relative">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500/3 to-transparent pointer-events-none" />
+    <section style={{ position: "relative", padding: "6rem 0" }}>
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent, rgba(139,92,246,0.03), transparent)", pointerEvents: "none" }} />
       <div className="section-container">
-        <div className="text-center mb-14">
-          <motion.h2
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-4xl font-bold text-slate-100 mb-3"
+        <div style={{ textAlign: "center", marginBottom: "3.5rem" }}>
+          <h2
+            style={{
+              fontSize: "clamp(1.875rem, 4vw, 2.5rem)",
+              fontWeight: 700,
+              color: "#f1f5f9",
+              marginBottom: "0.75rem",
+              animation: "fadeInUp 0.4s ease both",
+            }}
           >
             Loved by builders
-          </motion.h2>
-          <p className="text-slate-400">Trusted by startups shipping real products</p>
+          </h2>
+          <p style={{ color: "#94a3b8" }}>Trusted by startups shipping real products</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {TESTIMONIALS.map(({ text, author, role, avatar, color }, i) => (
-            <motion.div
-              key={author}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: i * 0.1 }}
-              className="glass rounded-xl p-6 glass-hover spotlight flex flex-col"
-            >
-              {/* Stars */}
-              <div className="flex gap-0.5 mb-4">
-                {Array(5).fill(0).map((_, j) => (
-                  <span key={j} className="text-yellow-400 text-sm">★</span>
-                ))}
-              </div>
-
-              <p className="text-slate-300 text-sm leading-relaxed flex-1 mb-5">
-                &ldquo;{text}&rdquo;
-              </p>
-
-              <div className="flex items-center gap-3">
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold ${
-                  color === "purple"
-                    ? "bg-purple-500/20 text-purple-300"
-                    : "bg-cyan-500/20 text-cyan-300"
-                }`}>
-                  {avatar}
+        <div className="testimonials-grid">
+          {TESTIMONIALS.map(({ text, author, role, avatar, color }, i) => {
+            const isPurple = color === "purple";
+            return (
+              <div
+                key={author}
+                className="glass glass-hover spotlight"
+                style={{
+                  borderRadius: "0.75rem",
+                  padding: "1.5rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  animation: "fadeInUp 0.4s ease both",
+                  animationDelay: `${i * 0.1}s`,
+                }}
+              >
+                {/* Stars */}
+                <div style={{ display: "flex", gap: "0.125rem", marginBottom: "1rem" }}>
+                  {Array(5).fill(0).map((_, j) => (
+                    <span key={j} style={{ color: "#facc15", fontSize: "0.875rem" }}>★</span>
+                  ))}
                 </div>
-                <div>
-                  <div className="text-sm font-medium text-slate-200">{author}</div>
-                  <div className="text-xs text-slate-500">{role}</div>
+
+                <p style={{ color: "#cbd5e1", fontSize: "0.875rem", lineHeight: 1.7, flex: 1, marginBottom: "1.25rem" }}>
+                  &ldquo;{text}&rdquo;
+                </p>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                  <div style={{
+                    width: "2.25rem",
+                    height: "2.25rem",
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "0.75rem",
+                    fontWeight: 700,
+                    background: isPurple ? "rgba(139,92,246,0.2)" : "rgba(6,182,212,0.2)",
+                    color: isPurple ? "#c4b5fd" : "#67e8f9",
+                  }}>
+                    {avatar}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: "0.875rem", fontWeight: 500, color: "#e2e8f0" }}>{author}</div>
+                    <div style={{ fontSize: "0.75rem", color: "#64748b" }}>{role}</div>
+                  </div>
                 </div>
               </div>
-            </motion.div>
-          ))}
+            );
+          })}
         </div>
       </div>
+
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .testimonials-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1.25rem;
+        }
+        @media (max-width: 768px) {
+          .testimonials-grid { grid-template-columns: 1fr; }
+        }
+      `}</style>
     </section>
   );
 }

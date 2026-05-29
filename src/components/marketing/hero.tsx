@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { ArrowRight, Zap, Shield, Sparkles } from "lucide-react";
 
 export function HeroSection() {
@@ -11,7 +10,7 @@ export function HeroSection() {
       <div className="aurora" />
 
       {/* Grid pattern */}
-      <div className="absolute inset-0 grid-pattern" style={{ opacity: 0.6 }} />
+      <div style={{ position: "absolute", inset: 0, opacity: 0.6 }} className="grid-pattern" />
 
       {/* Radial fade */}
       <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 80% 60% at 50% 0%, transparent 0%, #09090f 70%)", pointerEvents: "none" }} />
@@ -24,23 +23,15 @@ export function HeroSection() {
       <div style={{ position: "relative", zIndex: 10, maxWidth: "64rem", margin: "0 auto", padding: "0 1.5rem", textAlign: "center" }}>
 
         {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          style={{ marginBottom: "2rem" }}
-        >
+        <div style={{ marginBottom: "2rem", animation: "fadeInUp 0.5s ease both", animationDelay: "0s" }}>
           <span className="badge" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
             <span className="glow-dot" />
             Now in public beta — free to start
           </span>
-        </motion.div>
+        </div>
 
         {/* Headline */}
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.1 }}
+        <h1
           style={{
             fontSize: "clamp(2.5rem, 7vw, 4.5rem)",
             fontWeight: 700,
@@ -48,35 +39,42 @@ export function HeroSection() {
             letterSpacing: "-0.025em",
             color: "#f1f5f9",
             marginBottom: "1.5rem",
+            animation: "fadeInUp 0.55s ease both",
+            animationDelay: "0.1s",
           }}
         >
           AI that actually{" "}
           <span className="gradient-text-animated">works for you</span>
-        </motion.h1>
+        </h1>
 
         {/* Subheadline */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.2 }}
+        <p
           style={{
             fontSize: "1.125rem",
             color: "#94a3b8",
             maxWidth: "40rem",
             margin: "0 auto 2.5rem",
             lineHeight: 1.7,
+            animation: "fadeInUp 0.55s ease both",
+            animationDelay: "0.2s",
           }}
         >
           Nocodly AI gives your team a powerful AI workspace — text generation,
           smart automation, and analytics. From idea to production in minutes.
-        </motion.p>
+        </p>
 
         {/* CTA buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.3 }}
-          style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "center", gap: "1rem", marginBottom: "3rem" }}
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "1rem",
+            marginBottom: "3rem",
+            animation: "fadeInUp 0.55s ease both",
+            animationDelay: "0.3s",
+          }}
         >
           <Link
             href="/register"
@@ -116,14 +114,19 @@ export function HeroSection() {
           >
             See how it works
           </Link>
-        </motion.div>
+        </div>
 
         {/* Trust indicators */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "center", gap: "1.5rem" }}
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "1.5rem",
+            animation: "fadeInUp 0.5s ease both",
+            animationDelay: "0.4s",
+          }}
         >
           {[
             { icon: Zap, text: "No credit card required" },
@@ -135,14 +138,16 @@ export function HeroSection() {
               <span>{text}</span>
             </div>
           ))}
-        </motion.div>
+        </div>
 
         {/* Dashboard preview */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.5 }}
-          style={{ marginTop: "4rem", position: "relative" }}
+        <div
+          style={{
+            marginTop: "4rem",
+            position: "relative",
+            animation: "fadeInUp 0.7s ease both",
+            animationDelay: "0.5s",
+          }}
         >
           {/* Glow */}
           <div style={{ position: "absolute", inset: "-1rem", background: "linear-gradient(to bottom, rgba(139,92,246,0.08), transparent)", borderRadius: "1.5rem", filter: "blur(20px)" }} />
@@ -224,8 +229,15 @@ export function HeroSection() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
+
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </section>
   );
 }

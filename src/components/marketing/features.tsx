@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Sparkles, Database, CreditCard, Shield, Zap, BarChart3, Code2, Globe } from "lucide-react";
 
 const FEATURES = [
@@ -54,75 +53,101 @@ const FEATURES = [
   },
 ];
 
-const colorMap = {
-  purple: {
-    icon: "feature-icon-purple",
-    glow: "feature-glow-purple",
-  },
-  cyan: {
-    icon: "feature-icon-cyan",
-    glow: "feature-glow-cyan",
-  },
-};
-
 export function FeaturesSection() {
   return (
-    <section id="features" className="py-24 relative">
+    <section id="features" style={{ position: "relative", padding: "6rem 0" }}>
       <div className="section-container">
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: "4rem" }}>
-          <motion.span
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
+          <span
             className="badge mb-4 inline-block"
+            style={{ display: "inline-block", marginBottom: "1rem", animation: "fadeInUp 0.5s ease both" }}
           >
             Everything you need
-          </motion.span>
-          <motion.h2
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="text-4xl sm:text-5xl font-bold text-slate-100 mb-4"
+          </span>
+          <h2
+            style={{
+              fontSize: "clamp(2rem, 5vw, 3rem)",
+              fontWeight: 700,
+              color: "#f1f5f9",
+              marginBottom: "1rem",
+              animation: "fadeInUp 0.4s ease both",
+              animationDelay: "0.05s",
+            }}
           >
             Built for production,{" "}
             <span className="gradient-text">from day one</span>
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            className="text-slate-400 text-lg max-w-xl mx-auto"
+          </h2>
+          <p
+            style={{
+              color: "#94a3b8",
+              fontSize: "1.125rem",
+              maxWidth: "36rem",
+              margin: "0 auto",
+              animation: "fadeInUp 0.4s ease both",
+              animationDelay: "0.1s",
+            }}
           >
             A complete SaaS stack with AI, auth, billing, and analytics — so you can focus on your product.
-          </motion.p>
+          </p>
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="features-grid">
           {FEATURES.map(({ icon: Icon, title, description, color }, i) => {
-            const styles = colorMap[color as keyof typeof colorMap];
+            const isPurple = color === "purple";
             return (
-              <motion.div
+              <div
                 key={title}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.05 }}
-                className={`glass rounded-xl p-5 glass-hover spotlight cursor-default ${styles.glow} transition-all duration-200`}
+                className={`glass glass-hover spotlight ${isPurple ? "feature-glow-purple" : "feature-glow-cyan"}`}
+                style={{
+                  borderRadius: "0.75rem",
+                  padding: "1.25rem",
+                  cursor: "default",
+                  transition: "all 0.2s",
+                  animation: "fadeInUp 0.4s ease both",
+                  animationDelay: `${i * 0.05}s`,
+                }}
               >
-                <div className={`w-10 h-10 rounded-lg border flex items-center justify-center mb-4 ${styles.icon}`}>
-                  <Icon className="w-5 h-5" />
+                <div
+                  className={isPurple ? "feature-icon-purple" : "feature-icon-cyan"}
+                  style={{
+                    width: "2.5rem",
+                    height: "2.5rem",
+                    borderRadius: "0.5rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: "1rem",
+                  }}
+                >
+                  <Icon style={{ width: "1.25rem", height: "1.25rem" }} />
                 </div>
-                <h3 className="font-semibold text-slate-100 mb-2 text-sm">{title}</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">{description}</p>
-              </motion.div>
+                <h3 style={{ fontWeight: 600, color: "#f1f5f9", marginBottom: "0.5rem", fontSize: "0.875rem" }}>{title}</h3>
+                <p style={{ fontSize: "0.75rem", color: "#64748b", lineHeight: 1.6 }}>{description}</p>
+              </div>
             );
           })}
         </div>
       </div>
+
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .features-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 1rem;
+        }
+        @media (max-width: 1024px) {
+          .features-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 640px) {
+          .features-grid { grid-template-columns: 1fr; }
+        }
+      `}</style>
     </section>
   );
 }

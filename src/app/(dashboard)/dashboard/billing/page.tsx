@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -71,7 +70,7 @@ export default function BillingPage() {
       <DashboardHeader title="Billing & Plans" description="Manage your subscription and usage limits." />
 
       {/* Current plan */}
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+      <div style={{ animation: "fadeInUp 0.3s ease both" }}>
         <Card style={{ marginBottom: "2rem" }}>
           <CardHeader>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -124,7 +123,7 @@ export default function BillingPage() {
             )}
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
 
       {/* Upgrade plans */}
       <p style={{ fontSize: "1.0625rem", fontWeight: 600, color: "#e2e8f0", marginBottom: "1rem" }}>Upgrade your plan</p>
@@ -132,7 +131,14 @@ export default function BillingPage() {
         {Object.entries(PLANS).map(([key, plan], i) => {
           const isPro = key === "pro";
           return (
-            <motion.div key={key} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} style={{ display: "flex" }}>
+            <div
+              key={key}
+              style={{
+                display: "flex",
+                animation: "fadeInUp 0.3s ease both",
+                animationDelay: `${i * 0.1}s`,
+              }}
+            >
               <Card style={{
                 position: "relative", flex: 1,
                 border: isPro ? "1px solid rgba(139,92,246,0.25)" : undefined,
@@ -179,13 +185,13 @@ export default function BillingPage() {
                   </Button>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           );
         })}
       </div>
 
       {/* Billing history */}
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} style={{ marginTop: "2rem" }}>
+      <div style={{ marginTop: "2rem", animation: "fadeInUp 0.3s ease both", animationDelay: "0.3s" }}>
         <Card>
           <CardHeader><CardTitle>Billing History</CardTitle></CardHeader>
           <CardContent>
@@ -194,10 +200,14 @@ export default function BillingPage() {
             </div>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
 
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
         @media (max-width: 640px) { .billing-grid { grid-template-columns: 1fr !important; } }
       `}</style>
     </div>

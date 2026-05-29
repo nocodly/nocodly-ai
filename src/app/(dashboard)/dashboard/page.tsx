@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -96,7 +95,13 @@ export default function DashboardPage() {
       {/* Stats grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
         {STATS.map(({ label, value, change, icon: Icon, color }, i) => (
-          <motion.div key={label} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: i * 0.07 }}>
+          <div
+            key={label}
+            style={{
+              animation: "fadeInUp 0.3s ease both",
+              animationDelay: `${i * 0.07}s`,
+            }}
+          >
             <Card glow className="relative overflow-hidden">
               <div style={{ position: "absolute", top: 0, right: 0, width: "5rem", height: "5rem", background: "linear-gradient(135deg, rgba(139,92,246,0.05), transparent)", borderRadius: "50%", filter: "blur(20px)" }} />
               <CardContent>
@@ -115,13 +120,16 @@ export default function DashboardPage() {
                 <div style={{ fontSize: "0.7rem", color: "#475569" }}>{change}</div>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         ))}
       </div>
 
       {/* Chart + quick actions */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "1.5rem", marginBottom: "1.5rem" }} className="chart-grid">
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.3 }} className="chart-col">
+        <div
+          style={{ animation: "fadeInUp 0.3s ease both", animationDelay: "0.3s" }}
+          className="chart-col"
+        >
           <Card>
             <CardHeader>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -155,24 +163,27 @@ export default function DashboardPage() {
               )}
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
 
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.35 }} className="actions-col">
+        <div
+          style={{ animation: "fadeInUp 0.3s ease both", animationDelay: "0.35s" }}
+          className="actions-col"
+        >
           <Card style={{ height: "100%" }}>
             <CardHeader><CardTitle>Quick Actions</CardTitle></CardHeader>
             <CardContent>
               <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                <Button className="w-full" style={{ justifyContent: "space-between" }} asChild>
+                <Button style={{ width: "100%", justifyContent: "space-between" }} asChild>
                   <Link href="/dashboard/generate" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     New Generation <ArrowRight style={{ width: "1rem", height: "1rem" }} />
                   </Link>
                 </Button>
-                <Button variant="outline" className="w-full" style={{ justifyContent: "space-between" }} asChild>
+                <Button variant="outline" style={{ width: "100%", justifyContent: "space-between" }} asChild>
                   <Link href="/dashboard/history" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     View History <ArrowRight style={{ width: "1rem", height: "1rem" }} />
                   </Link>
                 </Button>
-                <Button variant="outline" className="w-full" style={{ justifyContent: "space-between" }} asChild>
+                <Button variant="outline" style={{ width: "100%", justifyContent: "space-between" }} asChild>
                   <Link href="/dashboard/billing" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     Upgrade Plan <ArrowRight style={{ width: "1rem", height: "1rem" }} />
                   </Link>
@@ -190,11 +201,11 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       </div>
 
       {/* Recent generations */}
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.4 }}>
+      <div style={{ animation: "fadeInUp 0.3s ease both", animationDelay: "0.4s" }}>
         <Card>
           <CardHeader>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -236,10 +247,14 @@ export default function DashboardPage() {
             )}
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
 
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
         @media (min-width: 1024px) {
           .chart-grid { grid-template-columns: 2fr 1fr !important; }
         }

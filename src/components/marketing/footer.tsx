@@ -62,7 +62,7 @@ export function Footer() {
       <div style={{ maxWidth: "80rem", margin: "0 auto", padding: "0 1.5rem" }}>
 
         {/* Top grid */}
-        <div style={{
+        <div className="footer-grid" style={{
           display: "grid",
           gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
           gap: "2rem",
@@ -109,10 +109,13 @@ export function Footer() {
           <FooterLinkList title="Legal" links={LEGAL_LINKS} />
         </div>
 
-        {/* Responsive overrides for mobile */}
+        {/* Responsive overrides */}
         <style>{`
-          @media (max-width: 767px) {
+          @media (max-width: 1023px) {
             .footer-grid { grid-template-columns: 1fr 1fr !important; }
+          }
+          @media (max-width: 480px) {
+            .footer-grid { grid-template-columns: 1fr !important; }
           }
         `}</style>
 
